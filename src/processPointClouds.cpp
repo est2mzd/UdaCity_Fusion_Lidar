@@ -41,9 +41,27 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
 template<typename PointT>
 std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::SeparateClouds(pcl::PointIndices::Ptr inliers, typename pcl::PointCloud<PointT>::Ptr cloud) 
 {
-  // TODO: Create two new point clouds, one cloud with obstacles and other with segmented plane
+    // TODO: Create two new point clouds, one cloud with obstacles and other with segmented plane
+    // create instances of PointCloud class
+    typename pcl::PointCloud<PointT>::Ptr obstCloud (new pcl::PointCloud<PointT>());
+    typename pcl::PointCloud<PointT>::Ptr planeCloud (new pcl::PointCloud<PointT>());
 
-    std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> segResult(cloud, cloud);
+    // get plane data from inliers
+    for (int index : inliers->indices)
+    {
+        planeCloud->points.push_back(cloud->points[index]);
+    }
+
+    // extract obstract
+    pcl::ExtractIndices<PointT> extract;
+    extract.setInputCloud(cloud);
+    extract.setIndices(inliers);
+    extract.setNegative(true);
+    extract.filter(*obstCloud);
+
+    // create output : planeCloud & obstCloud
+    std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> segResult(obstCloud, planeCloud);
+    //std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> segResult(cloud, cloud);
     return segResult;
 }
 
@@ -54,8 +72,10 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
 
+    //-----------------------------------------------------------------------------------//
     // TODO:: Fill in this function to find inliers for the cloud.
     //https://pointclouds.org/documentation/tutorials/extract_indices.html#extract-indices
+    // init
     pcl::ModelCoefficients::Ptr coefficients{new pcl::ModelCoefficients};
     pcl::PointIndices::Ptr inliers {new pcl::PointIndices};
 
@@ -78,15 +98,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     {
         std::cerr << "Could not estimate a planar model for the given dataset." << std::endl;
     }
-
-    /*
-    // Extract the inliers
-    pcl::ExtractIndices<PointT> extract; // Create the filtering object
-    extract.setInputCloud (cloud);
-    extract.setIndices (inliers);
-    extract.setNegative (false);
-    extract.filter (*cloud);
-    */
+    //-----------------------------------------------------------------------------------//
 
     // Calc Run Time
     auto endTime = std::chrono::steady_clock::now();
