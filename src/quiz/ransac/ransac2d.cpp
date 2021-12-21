@@ -216,7 +216,6 @@ std::unordered_set<int> Ransac3D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int 
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime-startTime);
     std::cout << "Ransac took " << elapsedTime.count() << " milliseconds" << std::endl;
     return inliersResult;
-
 }
 
 
