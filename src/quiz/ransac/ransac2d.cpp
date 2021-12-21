@@ -182,7 +182,7 @@ std::unordered_set<int> Ransac3D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int 
 
         for(int index=0; index<cloud->points.size(); index++)
         {
-            // inliers has already 2 points.
+            // inliers has already 3 points.
             // To avoid to set the same value, I check it below.
             if(inliers.count(index) > 0)
             {
@@ -200,7 +200,7 @@ std::unordered_set<int> Ransac3D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int 
             if(d <= distanceTol)
             {
                 inliers.insert(index);
-                std::cout << "d = " << d << std::endl;
+                //std::cout << "d = " << d << std::endl;
             }
         }
 
