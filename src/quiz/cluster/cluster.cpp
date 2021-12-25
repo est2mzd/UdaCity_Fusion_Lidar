@@ -13,12 +13,18 @@
 pcl::visualization::PCLVisualizer::Ptr initScene(Box window, int zoom)
 {
 	pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer ("2D Viewer"));
-	viewer->setBackgroundColor (0, 0, 0);
+	viewer->setBackgroundColor (0.5, 0.5, 0.5);
   	viewer->initCameraParameters();
   	viewer->setCameraPosition(0, 0, zoom, 0, 1, 0);
   	viewer->addCoordinateSystem (1.0);
 
   	viewer->addCube(window.x_min, window.x_max, window.y_min, window.y_max, 0, 0, 1, 1, 1, "window");
+    // added by koba in order to modify window color
+    viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_COLOR, 0.0, 0.0, 0.0, "window" );
+    viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_SHADING, pcl::visualization::PCL_VISUALIZER_SHADING_GOURAUD, "window" );
+    viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_OPACITY, 255, "window" );
+
+
   	return viewer;
 }
 

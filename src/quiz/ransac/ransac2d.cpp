@@ -218,8 +218,6 @@ std::unordered_set<int> Ransac3D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int 
     return inliersResult;
 }
 
-
-
 int main ()
 {
 

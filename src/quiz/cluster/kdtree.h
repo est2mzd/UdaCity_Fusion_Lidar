@@ -36,10 +36,40 @@ struct KdTree
 		delete root;
 	}
 
-	void insert(std::vector<float> point, int id)
+    // Lesson : Lidar-3-6 : Insert Points
+    void insertHelper(Node** node, uint depth, std::vector<float> points, int id)
+    {
+        // If tree is empty.
+        if(*node == nullptr)
+        {
+            // *node is Address of the Real Object
+            // * is de-reference
+            *node = new Node(points, id);
+        }
+        else
+        {
+            // Calculate current dim
+            uint current_dim = depth % 2; // 0 or 1
+            
+            // if depth is even(0) -> compare X value
+            // if depth is odd(1)  -> compare Y value
+            if( points[current_dim] < ((*node)->point[current_dim])  )
+            {
+                insertHelper(&((*node)->left), depth+1, points, id);
+            }
+            else
+            {
+                insertHelper(&((*node)->right), depth+1, points, id);
+            }
+        }
+        //std::cout << "id = " << id << std::endl;
+    }
+
+	void insert(std::vector<float> points, int id)
 	{
 		// TODO: Fill in this function to insert a new point into the tree
-		// the function should create a new node and place correctly with in the root 
+		// the function should create a new node and place correctly with in the root
+        insertHelper(&root, 0, points, id);
 
 	}
 
