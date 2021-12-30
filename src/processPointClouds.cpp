@@ -21,19 +21,64 @@ void ProcessPointClouds<PointT>::numPoints(typename pcl::PointCloud<PointT>::Ptr
 
 
 template<typename PointT>
-typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr cloud, float filterRes, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
+typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr inputCloud, float filterResolution, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
 {
 
     // Time segmentation process
     auto startTime = std::chrono::steady_clock::now();
 
+    //---------------------------------------------//
+    // Lesson 4-5 : Filtering with PCL
     // TODO:: Fill in the function to do voxel grid point reduction and region based filtering
 
+    // Step-1 : Downsampling
+    // Create the filitering object : down sample the dataset using a leaf size of 0.2m
+    pcl::VoxelGrid<PointT> vg;
+    typename pcl::PointCloud<PointT>::Ptr downSampledCloud(new pcl::PointCloud<PointT>);
+    vg.setInputCloud(inputCloud);
+    vg.setLeafSize(filterResolution, filterResolution, filterResolution);
+    vg.filter(*downSampledCloud);
+
+    // Step-2   : Set Each Region
+    // Step-2-1 : Set All Region
+    pcl::CropBox<PointT> regionAll(true);
+    regionAll.setMin(minPoint);
+    regionAll.setMax(maxPoint);
+    regionAll.setInputCloud(downSampledCloud);
+
+    typename pcl::PointCloud<PointT>::Ptr cloudRegion(new pcl::PointCloud<PointT>);
+    regionAll.filter(*cloudRegion);
+
+
+    // Step-2-2 : Set Roof Region   
+    pcl::CropBox<PointT> regionRoof(true);
+    regionRoof.setMin(Eigen::Vector4f(-1.5, -1.7, -1.0, 1.0));
+    regionRoof.setMax(Eigen::Vector4f( 2.6,  1.7, -0.4, 1.0));
+    regionRoof.setInputCloud(cloudRegion);
+
+    std::vector<int> roofIDs;
+    regionRoof.filter(roofIDs);
+
+    // Step-3 : Remove Roof Points
+    pcl::PointIndices::Ptr roofPoints{new pcl::PointIndices};
+    for(int id : roofIDs)
+    {
+        roofPoints->indices.push_back(id);
+    }
+
+    pcl::ExtractIndices<PointT> extract;
+    extract.setInputCloud(cloudRegion);
+    extract.setIndices(roofPoints);
+    extract.setNegative(true);
+    extract.filter(*cloudRegion);
+
+
+    //---------------------------------------------//
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
-    return cloud;
+    return cloudRegion;
 
 }
 
