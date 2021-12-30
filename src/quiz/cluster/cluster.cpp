@@ -13,7 +13,7 @@
 pcl::visualization::PCLVisualizer::Ptr initScene(Box window, int zoom)
 {
 	pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer ("2D Viewer"));
-	viewer->setBackgroundColor (0.5, 0.5, 0.5);
+	viewer->setBackgroundColor (0.0, 0.0, 0.0); // mod by koba
   	viewer->initCameraParameters();
   	viewer->setCameraPosition(0, 0, zoom, 0, 1, 0);
   	viewer->addCoordinateSystem (1.0);
@@ -26,7 +26,7 @@ pcl::visualization::PCLVisualizer::Ptr initScene(Box window, int zoom)
 		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_OPACITY, 255, "window" );
 	}
 	else{
-		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_COLOR, 0.5, 0.5, 0, "window" );     
+		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 1.0, 1.0, "window" );     
 		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_SHADING, pcl::visualization::PCL_VISUALIZER_SHADING_GOURAUD, "window" );     
 		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_OPACITY, 255, "window" );
 	}
