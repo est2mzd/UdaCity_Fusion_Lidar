@@ -20,9 +20,18 @@ pcl::visualization::PCLVisualizer::Ptr initScene(Box window, int zoom)
 
   	viewer->addCube(window.x_min, window.x_max, window.y_min, window.y_max, 0, 0, 1, 1, 1, "window");
     // added by koba in order to modify window color
-    viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_COLOR, 0.0, 0.0, 0.0, "window" );
-    viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_SHADING, pcl::visualization::PCL_VISUALIZER_SHADING_GOURAUD, "window" );
-    viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_OPACITY, 255, "window" );
+	if(0){
+		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_COLOR, 0.0, 0.0, 0.0, "window" );
+		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_SHADING, pcl::visualization::PCL_VISUALIZER_SHADING_GOURAUD, "window" );
+		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_OPACITY, 255, "window" );
+	}
+	else{
+		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_COLOR, 0.5, 0.5, 0, "window" );     
+		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_SHADING, pcl::visualization::PCL_VISUALIZER_SHADING_GOURAUD, "window" );     
+		viewer->setShapeRenderingProperties ( pcl::visualization::PCL_VISUALIZER_OPACITY, 255, "window" );
+	}
+
+
 
 
   	return viewer;
