@@ -151,5 +151,7 @@ int main ()
   	{
   	  viewer->spinOnce ();
   	}
+	
+	// TEST
   	
 }
