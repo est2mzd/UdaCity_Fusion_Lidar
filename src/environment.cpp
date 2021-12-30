@@ -80,9 +80,12 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
         pointProcessor.numPoints(cluster);
         renderPointCloud(viewer, cluster, "obstCloud" + std::to_string(clusterId), colors[clusterId % colors.size()]);
 
-        //Box box = pointProcessor.BoundingBox(cluster);
-        //renderBox(viewer, box, clusterId);
-
+        //-----------------------------------------------------------------------------------------
+        // Lesson : Lidar-3-9. Bounding Boxes 
+        Box box = pointProcessor.BoundingBox(cluster);
+        renderBox(viewer, box, clusterId);
+        //-----------------------------------------------------------------------------------------
+        
         ++clusterId;
     }
 
