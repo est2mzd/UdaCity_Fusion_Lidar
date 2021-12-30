@@ -84,9 +84,9 @@ void clusterHelper(int id, const std::vector<std::vector<float>> points, std::ve
 {
 	// process the point of "input id"
 	processed[id] = true;
-	clusters.puch_back(id);
+	clusters.push_back(id);
 
-	// Find nearest point list of points[id] --> nearest
+	// Find the nearest point list of points[id] --> nearest
 	std::vector<int> nearest = tree->search(points[id], distanceTol);
 
 	// process the points in "ids of nearest"
@@ -94,7 +94,7 @@ void clusterHelper(int id, const std::vector<std::vector<float>> points, std::ve
 	{
 		if(!processed[i])
 		{
-			clusterHelper(i, points, cluster, processed, tree, distanceTol);
+			clusterHelper(i, points, clusters, processed, tree, distanceTol);
 		}
 	}
 }
