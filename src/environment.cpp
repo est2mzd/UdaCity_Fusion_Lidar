@@ -196,7 +196,7 @@ int main (int argc, char** argv)
     std::cout << "starting enviroment" << std::endl;
 
     pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
-    CameraAngle setAngle = XY;
+    CameraAngle setAngle = TopDown; // XY, TopDown, Side, FPS
     initCamera(setAngle, viewer);
     //simpleHighway(viewer);
     
