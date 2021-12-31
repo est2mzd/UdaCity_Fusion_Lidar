@@ -98,13 +98,12 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // Open 3D viewer and Display City Block
     ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
-    renderPointCloud(viewer, inputCloud, "InputCloud");
+    //renderPointCloud(viewer, inputCloud, "InputCloud");
 
     
     // Create pointProcessor instance
     ProcessPointClouds<pcl::PointXYZI> pointProcessor;
 
-    /*
     // Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
     float filterResolution       = 2.0f;
     Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-100.0, -100.0, -100.0, 1);
@@ -112,8 +111,6 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
 
     renderPointCloud(viewer, filteredCloud, "test");
-
-    /*
 
     /*
     // Separate PointClouds to Plane and Obstacles
