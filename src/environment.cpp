@@ -107,7 +107,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     float filterResolution       = 2.0f;
     Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-100.0, -100.0, -100.0, 1);
     Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f( 100.0,  100.0,  100.0, 1);
-    pcl::PointCloud<PointXYZ>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
 
     renderPointCloud(viewer, filteredCloud, "test");
 
