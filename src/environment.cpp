@@ -95,37 +95,52 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
 // Lesson : Lidar-4-2. Load PCD
 void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
-    // Open 3D viewer and Display City Block
+    //-----------------------------------------------------------------------------------------
+    // Settings
+    bool renderRaw           = false;
+    bool renderFilteredCloud = true;
+    bool renderObstacles     = false;
+    bool renderPlane         = false;
+    bool renderCluster       = true;
+    bool renderClusterBox    = false;
+
+    //-----------------------------------------------------------------------------------------
+    // Step-1 : Load PCD, Open 3D viewer and Display City Block
     ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
-    //renderPointCloud(viewer, inputCloud, "InputCloud");
-
+  
+    if(renderRaw){
+        renderPointCloud(viewer, inputCloud, "InputCloud");
+    }
     
-    // Create pointProcessor instance
+    //-----------------------------------------------------------------------------------------
+    // Step-2 : Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
     ProcessPointClouds<pcl::PointXYZI> pointProcessor;
-
-    // Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
     float filterResolution       = 0.1f;
-    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-100.0, -100.0, -100.0, 1);
-    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f( 100.0,  100.0,  100.0, 1);
+    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-100.0, -20.0, -10.0, 1);
+    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f( 100.0,  20.0,  10.0, 1);
     pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
-
-    renderPointCloud(viewer, filteredCloud, "test");
-
+ 
+    if(renderFilteredCloud){
+        renderPointCloud(viewer, filteredCloud, "FilteredCloud");
+    }
     
-    // Separate PointClouds to Plane and Obstacles
+    //-----------------------------------------------------------------------------------------
+    // Step-3 : Separate PointClouds to Plane and Obstacles
     int maxIterations       = 10;
     float distanceThreshold = 0.2;
     std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessor.SegmentPlane(filteredCloud, maxIterations, distanceThreshold);
+   
+    if(renderObstacles){
+        renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
+    }
+    if(renderPlane){
+        renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0,1,0));
+    }
 
-    // render something
-    renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
-    renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0,1,0));
-
-    /*
     //-----------------------------------------------------------------------------------------
-    // Lesson : Lidar-3-3. Euclidean Clustering with PCL
-    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, 1.0, 3, 30);
+    // Step-4 : Euclidean Clustering with PCL
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, 1.0, 3, 30);
 
     int clusterId = 0;
     std::vector<Color> colors = {Color(1,0,0), Color(1,1,0), Color(0,0,1)};
@@ -133,18 +148,21 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     {
         std::cout << "cluster size ";
         pointProcessor.numPoints(cluster);
-        renderPointCloud(viewer, cluster, "obstCloud" + std::to_string(clusterId), colors[clusterId % colors.size()]);
+
+        if(renderCluster){
+            renderPointCloud(viewer, cluster, "obstCloud" + std::to_string(clusterId), colors[clusterId % colors.size()]);
+        }
 
         //-----------------------------------------------------------------------------------------
-        // Lesson : Lidar-3-9. Bounding Boxes 
-        Box box = pointProcessor.BoundingBox(cluster);
-        renderBox(viewer, box, clusterId);
+        // Lesson : Lidar-3-9. Bounding Boxes
+        if(renderClusterBox){ 
+            Box box = pointProcessor.BoundingBox(cluster);
+            renderBox(viewer, box, clusterId);
+        }
         //-----------------------------------------------------------------------------------------
 
         ++clusterId;
     }
-    */
-
 } 
 
 
