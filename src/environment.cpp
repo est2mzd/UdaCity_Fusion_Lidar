@@ -99,10 +99,10 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // Settings
     bool renderRaw           = false;
     bool renderFilteredCloud = false;
-    bool renderObstacles     = true;
+    bool renderObstacles     = false;
     bool renderPlane         = true;
-    bool renderCluster       = false;
-    bool renderClusterBox    = false;
+    bool renderCluster       = true;
+    bool renderClusterBox    = true;
     float boxLength          = 15.0;
     float boxWidth           = 6.5;
 
@@ -142,7 +142,10 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
 
     //-----------------------------------------------------------------------------------------
     // Step-4 : Euclidean Clustering with PCL
-    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, 1.0, 3, 30);
+    float clusterTolerance = 1.0;
+    int minSize = 3;
+    int maxSize = 30;
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
 
     int clusterId = 0;
     std::vector<Color> colors = {Color(1,0,0), Color(1,1,0), Color(0,0,1)};
