@@ -171,7 +171,7 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
     //pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>); // OK
     //pcl::search::KdTree<pcl::PointCloud<PointT>>::Ptr tree(new pcl::search::KdTree<pcl::PointCloud<PointT>>); // Error
     //pcl::search::KdTree<pcl::PointT>::Ptr tree(new pcl::search::KdTree<pcl::PointT>); // Error
-    pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>); 
+    typename pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>); 
     tree->setInputCloud(cloud);
 
     std::vector<pcl::PointIndices> clusterIndices;
