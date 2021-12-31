@@ -98,13 +98,13 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     //-----------------------------------------------------------------------------------------
     // Settings
     bool renderRaw           = false;
-    bool renderFilteredCloud = true;
+    bool renderFilteredCloud = false;
     bool renderObstacles     = false;
-    bool renderPlane         = false;
+    bool renderPlane         = true;
     bool renderCluster       = true;
     bool renderClusterBox    = false;
-    float boxLength          = 20.0;
-    float boxWidth           = 4.0 * 3;
+    float boxLength          = 10.0;
+    float boxWidth           = 4.0 * 2;
 
     //-----------------------------------------------------------------------------------------
     // Step-1 : Load PCD, Open 3D viewer and Display City Block
