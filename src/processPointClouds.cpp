@@ -157,12 +157,14 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
     std::vector<typename pcl::PointCloud<PointT>::Ptr> clusters;
 
     // TODO:: Fill in the function to perform euclidean clustering to group detected obstacles
-    //pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
-    pcl::search::KdTree<pcl::PointCloud<PointT>>::Ptr tree(new pcl::search::KdTree<pcl::PointCloud<PointT>>);
+    //pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>); // OK
+    //pcl::search::KdTree<pcl::PointCloud<PointT>>::Ptr tree(new pcl::search::KdTree<pcl::PointCloud<PointT>>); // Error
+    pcl::search::KdTree<pcl::PointT>::Ptr tree(new pcl::search::KdTree<pcl::PointT>);
     tree->setInputCloud(cloud);
 
     std::vector<pcl::PointIndices> clusterIndices;
-    pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
+    //pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec; // OK
+    pcl::EuclideanClusterExtraction<pcl::PointT> ec;
     ec.setClusterTolerance(clusterTolerance);
     ec.setMinClusterSize(minSize);
     ec.setMaxClusterSize(maxSize);
