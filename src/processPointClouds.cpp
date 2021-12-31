@@ -19,7 +19,9 @@ void ProcessPointClouds<PointT>::numPoints(typename pcl::PointCloud<PointT>::Ptr
     std::cout << cloud->points.size() << std::endl;
 }
 
-
+//--------------------------------------------------------------------------------------//
+// FilterCloud
+//--------------------------------------------------------------------------------------//
 template<typename PointT>
 typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr inputCloud, float filterResolution, Eigen::Vector4f boxMinPoint, Eigen::Vector4f boxMaxPoint)
 {
@@ -76,6 +78,9 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
 }
 
 
+//--------------------------------------------------------------------------------------//
+// SeparateClouds
+//--------------------------------------------------------------------------------------//
 template<typename PointT>
 std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::SeparateClouds(pcl::PointIndices::Ptr inliers, typename pcl::PointCloud<PointT>::Ptr cloud) 
 {
@@ -104,6 +109,9 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 }
 
 
+//--------------------------------------------------------------------------------------//
+// SegmentPlane
+//--------------------------------------------------------------------------------------//
 template<typename PointT>
 std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::SegmentPlane(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceThreshold)
 {
@@ -149,6 +157,9 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
 }
 
 
+//--------------------------------------------------------------------------------------//
+//Clustering
+//--------------------------------------------------------------------------------------//
 template<typename PointT>
 std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::Clustering(typename pcl::PointCloud<PointT>::Ptr cloud, float clusterTolerance, int minSize, int maxSize)
 {
@@ -157,14 +168,16 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
     std::vector<typename pcl::PointCloud<PointT>::Ptr> clusters;
 
     // TODO:: Fill in the function to perform euclidean clustering to group detected obstacles
-    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>); // OK
+    //pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>); // OK
     //pcl::search::KdTree<pcl::PointCloud<PointT>>::Ptr tree(new pcl::search::KdTree<pcl::PointCloud<PointT>>); // Error
     //pcl::search::KdTree<pcl::PointT>::Ptr tree(new pcl::search::KdTree<pcl::PointT>); // Error
+    pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>); 
     tree->setInputCloud(cloud);
 
     std::vector<pcl::PointIndices> clusterIndices;
-    pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec; // OK
+    //pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec; // OK
     //pcl::EuclideanClusterExtraction<pcl::PointT> ec; // Error
+    pcl::EuclideanClusterExtraction<PointT> ec;
     ec.setClusterTolerance(clusterTolerance);
     ec.setMinClusterSize(minSize);
     ec.setMaxClusterSize(maxSize);
@@ -196,7 +209,9 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> ProcessPointClouds<PointT>::C
     return clusters;
 }
 
-
+//--------------------------------------------------------------------------------------//
+//BoundingBox
+//--------------------------------------------------------------------------------------//
 template<typename PointT>
 Box ProcessPointClouds<PointT>::BoundingBox(typename pcl::PointCloud<PointT>::Ptr cluster)
 {
@@ -216,7 +231,9 @@ Box ProcessPointClouds<PointT>::BoundingBox(typename pcl::PointCloud<PointT>::Pt
     return box;
 }
 
-
+//--------------------------------------------------------------------------------------//
+//savePcd
+//--------------------------------------------------------------------------------------//
 template<typename PointT>
 void ProcessPointClouds<PointT>::savePcd(typename pcl::PointCloud<PointT>::Ptr cloud, std::string file)
 {
@@ -224,7 +241,9 @@ void ProcessPointClouds<PointT>::savePcd(typename pcl::PointCloud<PointT>::Ptr c
     std::cerr << "Saved " << cloud->points.size () << " data points to "+file << std::endl;
 }
 
-
+//--------------------------------------------------------------------------------------//
+//loadPcd
+//--------------------------------------------------------------------------------------//
 template<typename PointT>
 typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::loadPcd(std::string file)
 {
@@ -240,7 +259,9 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::loadPcd(std::s
     return cloud;
 }
 
-
+//--------------------------------------------------------------------------------------//
+//streamPcd
+//--------------------------------------------------------------------------------------//
 template<typename PointT>
 std::vector<boost::filesystem::path> ProcessPointClouds<PointT>::streamPcd(std::string dataPath)
 {
