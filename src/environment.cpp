@@ -103,8 +103,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     bool renderPlane         = true;
     bool renderCluster       = false;
     bool renderClusterBox    = false;
-    float boxLength          = 10.0;
-    float boxWidth           = 4.0 * 2;
+    float boxLength          = 15.0;
+    float boxWidth           = 6.5;
 
     //-----------------------------------------------------------------------------------------
     // Step-1 : Load PCD, Open 3D viewer and Display City Block
