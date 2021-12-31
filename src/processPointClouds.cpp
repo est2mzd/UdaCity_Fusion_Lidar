@@ -21,7 +21,7 @@ void ProcessPointClouds<PointT>::numPoints(typename pcl::PointCloud<PointT>::Ptr
 
 
 template<typename PointT>
-typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr inputCloud, float filterResolution, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint)
+typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(typename pcl::PointCloud<PointT>::Ptr inputCloud, float filterResolution, Eigen::Vector4f boxMinPoint, Eigen::Vector4f boxMaxPoint)
 {
 
     // Time segmentation process
@@ -33,53 +33,46 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
 
     // Step-1 : Downsampling
     // Create the filitering object : down sample the dataset using a leaf size of 0.2m
-    pcl::VoxelGrid<PointT> vg;
+    pcl::VoxelGrid<PointT> voxelGrid;
     typename pcl::PointCloud<PointT>::Ptr downSampledCloud(new pcl::PointCloud<PointT>);
-    vg.setInputCloud(inputCloud);
-    vg.setLeafSize(filterResolution, filterResolution, filterResolution);
-    vg.filter(*downSampledCloud);
+    voxelGrid.setInputCloud(inputCloud);
+    voxelGrid.setLeafSize(filterResolution, filterResolution, filterResolution);
+    voxelGrid.filter(*downSampledCloud);
 
-    // Step-2   : Set Each Region
-    // Step-2-1 : Set All Region
-    pcl::CropBox<PointT> regionAll(true);
-    regionAll.setMin(minPoint);
-    regionAll.setMax(maxPoint);
-    regionAll.setInputCloud(downSampledCloud);
+    // Step-2 : Crop with Box Point
+    pcl::CropBox<PointT> cropBox(true);
+    typename pcl::PointCloud<PointT>::Ptr cropedCloud(new pcl::PointCloud<PointT>);
+    cropBox.setMin(boxMinPoint);
+    cropBox.setMax(boxMaxPoint);
+    cropBox.setInputCloud(downSampledCloud);
+    cropBox.filter(*cropedCloud);
 
-    typename pcl::PointCloud<PointT>::Ptr cloudRegion(new pcl::PointCloud<PointT>);
-    regionAll.filter(*cloudRegion);
+    // Step-3 : Set Roof Cloud   
+    pcl::CropBox<PointT> cropBoxRoof(true);
+    std::vector<int> roofCloud;
+    cropBoxRoof.setMin(Eigen::Vector4f(-1.5, -1.7, -1.0, 1.0));
+    cropBoxRoof.setMax(Eigen::Vector4f( 2.6,  1.7, -0.4, 1.0));
+    cropBoxRoof.setInputCloud(cropedCloud);
+    cropBoxRoof.filter(roofCloud);
 
-
-    // Step-2-2 : Set Roof Region   
-    pcl::CropBox<PointT> regionRoof(true);
-    regionRoof.setMin(Eigen::Vector4f(-1.5, -1.7, -1.0, 1.0));
-    regionRoof.setMax(Eigen::Vector4f( 2.6,  1.7, -0.4, 1.0));
-    regionRoof.setInputCloud(cloudRegion);
-
-    std::vector<int> roofIDs;
-    regionRoof.filter(roofIDs);
-
-    // Step-3 : Remove Roof Points
-    pcl::PointIndices::Ptr roofPoints{new pcl::PointIndices};
-    for(int id : roofIDs)
+    // Step-4 : Remove Roof Points
+    pcl::PointIndices::Ptr roofPointIDs{new pcl::PointIndices};
+    for(int id : roofCloud)
     {
-        roofPoints->indices.push_back(id);
+        roofPointIDs->indices.push_back(id);
     }
-
     pcl::ExtractIndices<PointT> extract;
-    extract.setInputCloud(cloudRegion);
-    extract.setIndices(roofPoints);
+    extract.setInputCloud(cropedCloud);
+    extract.setIndices(roofPointIDs);
     extract.setNegative(true);
-    extract.filter(*cloudRegion);
-
+    extract.filter(*cropedCloud);
 
     //---------------------------------------------//
     auto endTime = std::chrono::steady_clock::now();
     auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
     std::cout << "filtering took " << elapsedTime.count() << " milliseconds" << std::endl;
 
-    return cloudRegion;
-
+    return cropedCloud;
 }
 
 
@@ -206,16 +199,16 @@ Box ProcessPointClouds<PointT>::BoundingBox(typename pcl::PointCloud<PointT>::Pt
 {
 
     // Find bounding box for one of the clusters
-    PointT minPoint, maxPoint;
-    pcl::getMinMax3D(*cluster, minPoint, maxPoint);
+    PointT boxMinPoint, boxMaxPoint;
+    pcl::getMinMax3D(*cluster, boxMinPoint, boxMaxPoint);
 
     Box box;
-    box.x_min = minPoint.x;
-    box.y_min = minPoint.y;
-    box.z_min = minPoint.z;
-    box.x_max = maxPoint.x;
-    box.y_max = maxPoint.y;
-    box.z_max = maxPoint.z;
+    box.x_min = boxMinPoint.x;
+    box.y_min = boxMinPoint.y;
+    box.z_min = boxMinPoint.z;
+    box.x_max = boxMaxPoint.x;
+    box.y_max = boxMaxPoint.y;
+    box.z_max = boxMaxPoint.z;
 
     return box;
 }

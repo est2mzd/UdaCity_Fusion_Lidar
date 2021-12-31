@@ -100,17 +100,22 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
     renderPointCloud(viewer, inputCloud, "InputCloud");
 
-    // create pointProcessor instance
+    // Create pointProcessor instance
     ProcessPointClouds<pcl::PointXYZ> pointProcessor;
 
-    // apply filter to cloud data
-    float filterResolution    = 2.0f;
-    Eigen::Vector4f minPoint  = Eigen::Vector4f();
-    Eigen::Vector4f maxPoint  = Eigen::Vector4f();
-    pcl::PointCloud<PointT>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, minPoint, maxPoint);
+    // Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
+    float filterResolution       = 2.0f;
+    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f();
+    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f();
+    pcl::PointCloud<PointT>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
 
+    renderPointCloud(viewer, filteredCloud, "test");
+
+    /*
     // Separate PointClouds to Plane and Obstacles
-    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessor.SegmentPlane(inputCloud, 100, 0.2);
+    int maxIterations       = 10;
+    float distanceThreshold = 0.2;
+    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessor.SegmentPlane(inputCloud, maxIterations, distanceThreshold);
 
     // render something
     renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
@@ -136,6 +141,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
 
         ++clusterId;
     }
+    */
 
 } 
 
