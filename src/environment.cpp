@@ -130,7 +130,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     //-----------------------------------------------------------------------------------------
     // Step-3 : Separate PointClouds to Plane and Obstacles
     int maxIterations       = 10;
-    float distanceThreshold = 0.2;
+    float distanceThreshold = 0.15;
     std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessor.SegmentPlane(filteredCloud, maxIterations, distanceThreshold);
    
     if(renderObstacles){
