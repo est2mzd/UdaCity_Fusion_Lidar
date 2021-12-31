@@ -101,7 +101,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     renderPointCloud(viewer, inputCloud, "InputCloud");
 
     // Create pointProcessor instance
-    ProcessPointClouds<pcl::PointXYZ> pointProcessor;
+    ProcessPointClouds<pcl::PointXYZI> pointProcessor;
 
     // Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
     float filterResolution       = 2.0f;
