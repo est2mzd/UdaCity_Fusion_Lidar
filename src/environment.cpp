@@ -105,23 +105,24 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     ProcessPointClouds<pcl::PointXYZI> pointProcessor;
 
     // Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
-    float filterResolution       = 2.0f;
+    float filterResolution       = 0.1f;
     Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-100.0, -100.0, -100.0, 1);
     Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f( 100.0,  100.0,  100.0, 1);
     pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
 
     renderPointCloud(viewer, filteredCloud, "test");
 
-    /*
+    
     // Separate PointClouds to Plane and Obstacles
     int maxIterations       = 10;
     float distanceThreshold = 0.2;
-    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessor.SegmentPlane(inputCloud, maxIterations, distanceThreshold);
+    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessor.SegmentPlane(filteredCloud, maxIterations, distanceThreshold);
 
     // render something
     renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
     renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0,1,0));
 
+    /*
     //-----------------------------------------------------------------------------------------
     // Lesson : Lidar-3-3. Euclidean Clustering with PCL
     std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, 1.0, 3, 30);
