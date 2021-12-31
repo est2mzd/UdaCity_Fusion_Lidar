@@ -100,6 +100,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
     renderPointCloud(viewer, inputCloud, "InputCloud");
 
+    /*
     // Create pointProcessor instance
     ProcessPointClouds<pcl::PointXYZI> pointProcessor;
 
@@ -110,6 +111,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
 
     renderPointCloud(viewer, filteredCloud, "test");
+
+    /*
 
     /*
     // Separate PointClouds to Plane and Obstacles
