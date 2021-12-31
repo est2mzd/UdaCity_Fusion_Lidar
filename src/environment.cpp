@@ -144,7 +144,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // Step-4 : Euclidean Clustering with PCL
     float clusterTolerance = 1.0;
     int minSize = 3;
-    int maxSize = 30;
+    int maxSize = 300;
     std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
 
     int clusterId = 0;
