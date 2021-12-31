@@ -99,6 +99,44 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
     pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
     renderPointCloud(viewer, inputCloud, "InputCloud");
+
+    // create pointProcessor instance
+    ProcessPointClouds<pcl::PointXYZ> pointProcessor;
+
+    // apply filter to cloud data
+    float filterResolution    = 2.0f;
+    Eigen::Vector4f minPoint  = Eigen::Vector4f();
+    Eigen::Vector4f maxPoint  = Eigen::Vector4f();
+    pcl::PointCloud<PointT>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, minPoint, maxPoint);
+
+    // Separate PointClouds to Plane and Obstacles
+    std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentCloud = pointProcessor.SegmentPlane(inputCloud, 100, 0.2);
+
+    // render something
+    renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
+    renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0,1,0));
+
+    //-----------------------------------------------------------------------------------------
+    // Lesson : Lidar-3-3. Euclidean Clustering with PCL
+    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, 1.0, 3, 30);
+
+    int clusterId = 0;
+    std::vector<Color> colors = {Color(1,0,0), Color(1,1,0), Color(0,0,1)};
+    for(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster : cloudClusters)
+    {
+        std::cout << "cluster size ";
+        pointProcessor.numPoints(cluster);
+        renderPointCloud(viewer, cluster, "obstCloud" + std::to_string(clusterId), colors[clusterId % colors.size()]);
+
+        //-----------------------------------------------------------------------------------------
+        // Lesson : Lidar-3-9. Bounding Boxes 
+        Box box = pointProcessor.BoundingBox(cluster);
+        renderBox(viewer, box, clusterId);
+        //-----------------------------------------------------------------------------------------
+
+        ++clusterId;
+    }
+
 } 
 
 
