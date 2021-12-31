@@ -103,6 +103,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     bool renderPlane         = false;
     bool renderCluster       = true;
     bool renderClusterBox    = false;
+    float boxLength          = 50.0;
+    float boxWidth           = 4.0 * 3;
 
     //-----------------------------------------------------------------------------------------
     // Step-1 : Load PCD, Open 3D viewer and Display City Block
@@ -117,8 +119,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // Step-2 : Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
     ProcessPointClouds<pcl::PointXYZI> pointProcessor;
     float filterResolution       = 0.1f;
-    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-100.0, -20.0, -10.0, 1);
-    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f( 100.0,  20.0,  10.0, 1);
+    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-boxLength, -boxWidth, -10.0, 1);
+    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f( boxLength,  boxWidth,  10.0, 1);
     pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
  
     if(renderFilteredCloud){
