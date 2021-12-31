@@ -105,8 +105,8 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
 
     // Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
     float filterResolution       = 2.0f;
-    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f();
-    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f();
+    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-100.0, -100.0, -100.0, 1);
+    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f( 100.0,  100.0,  100.0, 1);
     pcl::PointCloud<PointT>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
 
     renderPointCloud(viewer, filteredCloud, "test");
