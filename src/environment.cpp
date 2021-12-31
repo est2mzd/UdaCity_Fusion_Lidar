@@ -103,7 +103,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     bool renderPlane         = true;
     bool renderCluster       = true;
     bool renderClusterBox    = true;
-    float boxLength          = 15.0;
+    float boxLength          = 20.0;
     float boxWidth           = 6.5;
 
     //-----------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // Step-4 : Euclidean Clustering with PCL
     float clusterTolerance = 1.0;
     int minSize = 5;
-    int maxSize = 1100;
+    int maxSize = 1500;
     std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
 
     int clusterId = 0;
