@@ -99,9 +99,9 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // Settings
     bool renderRaw           = false;
     bool renderFilteredCloud = false;
-    bool renderObstacles     = false;
+    bool renderObstacles     = true;
     bool renderPlane         = true;
-    bool renderCluster       = true;
+    bool renderCluster       = false;
     bool renderClusterBox    = false;
     float boxLength          = 10.0;
     float boxWidth           = 4.0 * 2;
