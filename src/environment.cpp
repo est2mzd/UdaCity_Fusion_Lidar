@@ -213,7 +213,7 @@ int main (int argc, char** argv)
     std::string folderPath  = "/home/workspace/Udacity_Fusion_Lidar";
     std::string fileNamePng = folderPath + "/png/L4_6_" + getCurrentTime("") + ".png";
     std:cout << fileNamePng << std::endl;
-    pcl::visualization::PCLVisualizer* pngObj;
+    pcl::visualization::PCLVisualizer* pngObj("PNG OBJ");
     
 
     while (!viewer->wasStopped ())
