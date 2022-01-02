@@ -8,6 +8,8 @@
 // using templates for processPointClouds so also include .cpp to help linker
 #include "processPointClouds.cpp"
 
+#include "myUtility.cpp"
+
 std::vector<Car> initHighway(bool renderScene, pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
 
@@ -194,6 +196,7 @@ void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& vi
 }
 
 
+
 int main (int argc, char** argv)
 {
     std::cout << "starting enviroment" << std::endl;
@@ -206,9 +209,13 @@ int main (int argc, char** argv)
     //-----------------------------------------------------------------------------------------
     // Lesson : Lidar-4-2. Load PCD
     cityBlock(viewer);
+    std::cout << getCurrentTime("OK:") << std::endl;
 
     while (!viewer->wasStopped ())
     {
         viewer->spinOnce ();
     } 
+
+
+    //viewer->saveScreenshot()
 }
