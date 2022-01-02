@@ -220,7 +220,8 @@ int main (int argc, char** argv)
     {
         viewer->spinOnce ();
 
-        pngObj.saveScreenshot(fileNamePng);
+        //pngObj.saveScreenshot(fileNamePng);
+        viewer->saveScreenshot(fileNamePng);
         break;
     } 
 
