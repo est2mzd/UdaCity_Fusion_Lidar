@@ -224,9 +224,10 @@ int main (int argc, char** argv)
     */ 
 
     viewer->saveScreenshot(fileNamePng);
-    for(int i=0; i<10000000; i++)
+    for(int i=0; i<1000; i++)
     {
         viewer->spinOnce ();
     } 
-    viewer->saveScreenshot(fileNamePng);
+    //viewer->saveScreenshot(fileNamePng);
+    pcl::io::savePNGFile(fileNamePng, *viewer, "rgb");
 }
