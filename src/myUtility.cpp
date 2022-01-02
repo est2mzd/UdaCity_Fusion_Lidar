@@ -32,7 +32,7 @@ std::string replaceStringAll(std::string& strToReplace, std::string strBefore, s
         pos += lenAfter;
     }
 
-    return strToReplace.replace(pos, lenAfter, strToReplace);
+    return strToReplace;
 }
 
 //--------------------------------------------------------------//
