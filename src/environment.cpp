@@ -216,14 +216,16 @@ int main (int argc, char** argv)
     pcl::visualization::PCLVisualizer pngObj("PNG OBJ");
     
 
+    /*
     while (!viewer->wasStopped ())
     {
         viewer->spinOnce ();
+    }
+    */ 
 
-        //pngObj.saveScreenshot(fileNamePng);
-        viewer->saveScreenshot(fileNamePng);
-        break;
+    for(int i=0; i<10; i++)
+    {
+        viewer->spinOnce ();
     } 
-
-
+    viewer->saveScreenshot(fileNamePng);
 }
