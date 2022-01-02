@@ -229,5 +229,5 @@ int main (int argc, char** argv)
         viewer->spinOnce ();
     } 
     //viewer->saveScreenshot(fileNamePng);
-    pcl::io::savePNGFile(fileNamePng, *viewer, "rgb");
+    pcl::io::save(fileNamePng, viewer);
 }
