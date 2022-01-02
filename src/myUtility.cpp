@@ -1,35 +1,45 @@
 #include <string>
 #include <time.h>
+#include <iostream>
 
 //--------------------------------------------------------------//
 std::string replaceStringSingle(std::string& strToReplace, std::string strBefore, std::string strAfter )
 {
-    const unsigned int pos = strToReplace.find(strBefore);
+    const unsigned int posBefore = strToReplace.find(strBefore);
     const int lenAfter = strAfter.length();
 
-    if(pos == std::string::npos || strBefore.empty())
+    if(posBefore == std::string::npos || strBefore.empty())
     {
         return strToReplace;
     }
 
-    return strToReplace.replace(pos, lenAfter, strToReplace);
+    return strToReplace.replace(posBefore, lenAfter, strToReplace);
 }
+
+// String.replace( StartPos, Length, StrAfter)
+// Strinf.find( StrFind, StartPos, SearchLength)
 
 //--------------------------------------------------------------//
 std::string replaceStringAll(std::string& strToReplace, std::string strBefore, std::string strAfter )
 {
-    unsigned int pos = strToReplace.find(strBefore);
-    const int lenAfter = strAfter.length();
+    unsigned int posBefore = strToReplace.find(strBefore);
+    const int lenBefore = strBefore.length();
+    const int lenAfter  = strAfter.length();
 
-    if(strBefore.empty())
+    if(strBefore.empty() || strAfter.empty())
     {
         return strToReplace;
     }
 
-    while( (pos=strToReplace.find(strBefore, pos)) != std::string::npos )
+    while( (posBefore=strToReplace.find(strBefore, posBefore)) != std::string::npos )
     {
-        strToReplace.replace(pos, strBefore.length(), strAfter);
-        pos += lenAfter;
+        strToReplace.replace(posBefore, lenBefore, strAfter);
+        posBefore += lenAfter;
+
+        if(posBefore >= strToReplace.length())
+        {
+            break;
+        }
     }
 
     return strToReplace;
