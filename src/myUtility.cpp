@@ -13,6 +13,11 @@ std::string replaceStringSingle(std::string& strToReplace, std::string strBefore
         return strToReplace;
     }
 
+    if(posBefore>=strToReplace.length())
+    {
+        return strToReplace;
+    }
+
     return strToReplace.replace(posBefore, lenAfter, strToReplace);
 }
 
@@ -33,8 +38,6 @@ std::string replaceStringAll(std::string& strToReplace, std::string strBefore, s
 
     while( (posBefore=strToReplace.find(strBefore, posBefore)) != std::string::npos )
     {
-        std::cout << strToReplace << "/" << "pos=" << posBefore << std::endl;
-
         if(posBefore>=strToReplace.length())
         {
             break;

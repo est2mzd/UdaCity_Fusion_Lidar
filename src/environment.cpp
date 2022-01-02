@@ -209,7 +209,8 @@ int main (int argc, char** argv)
     //-----------------------------------------------------------------------------------------
     // Lesson : Lidar-4-2. Load PCD
     cityBlock(viewer);
-    std::cout << getCurrentTime("OK:") << std::endl;
+    std::string fileNamePng = "./png/L4_6_" + getCurrentTime("") + ".png";
+    viewer->saveScreenshot(fileNamePng);
 
     while (!viewer->wasStopped ())
     {
@@ -217,5 +218,4 @@ int main (int argc, char** argv)
     } 
 
 
-    //viewer->saveScreenshot()
 }
