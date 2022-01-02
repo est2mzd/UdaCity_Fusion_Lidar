@@ -34,6 +34,12 @@ std::string replaceStringAll(std::string& strToReplace, std::string strBefore, s
     while( (posBefore=strToReplace.find(strBefore, posBefore)) != std::string::npos )
     {
         std::cout << strToReplace << "/" << "pos=" << posBefore << std::endl;
+
+        if(posBefore>=strToReplace.length())
+        {
+            break;
+        }
+
         strToReplace.replace(posBefore, lenBefore, strAfter);
         posBefore += lenAfter;
     }
