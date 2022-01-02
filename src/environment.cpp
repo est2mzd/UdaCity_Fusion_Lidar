@@ -209,8 +209,11 @@ int main (int argc, char** argv)
     //-----------------------------------------------------------------------------------------
     // Lesson : Lidar-4-2. Load PCD
     cityBlock(viewer);
-    std::string fileNamePng = "./png/L4_6_" + getCurrentTime("") + ".png";
-    pcl::visualization::PCLVisualizer::saveScreenshot(fileNamePng);
+
+    std::string folderPath  = "/home/workspace/Udacity_Fusion_Lidar";
+    std::string fileNamePng = folderPath + "/png/L4_6_" + getCurrentTime("") + ".png";
+    pcl::visualization::PCLVisualizer* pngObj;
+    pngObj->saveScreenshot(fileNamePng);
 
     while (!viewer->wasStopped ())
     {
