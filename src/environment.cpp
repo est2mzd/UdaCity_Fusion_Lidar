@@ -308,6 +308,7 @@ void cityBlockVer3(pcl::visualization::PCLVisualizer::Ptr& viewer,
                    ProcessPointClouds<pcl::PointXYZI>* pointProcessorI,
                    const pcl::PointCloud<pcl::PointXYZI>::Ptr& inputCloud)
 {
+    std::cout << "run cityBlockVer3" << std::endl;
     //-----------------------------------------------------------------------------------------
     // Step-1 : Load PCD, Open 3D viewer and Display City Block
     //ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
@@ -326,7 +327,7 @@ void cityBlockVer3(pcl::visualization::PCLVisualizer::Ptr& viewer,
     int maxIterations       = 25; // mine is 10;
     float distanceThreshold = 0.3; // mine is 0.15;
     //std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(filteredCloud, maxIterations, distanceThreshold);
-    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = mySegmentPlane(filteredCloud, maxIterations, distanceThreshold);
+    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = mySegmentPlane<pcl::PointXYZI>(filteredCloud, maxIterations, distanceThreshold);
 
     //renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
     renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0,1,0));
@@ -337,7 +338,7 @@ void cityBlockVer3(pcl::visualization::PCLVisualizer::Ptr& viewer,
     int minSize = 10; // mine is 5;
     int maxSize = 500; // mine is 1500;
     //std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
-    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = myClustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = myClustering<pcl::PointXYZI>(segmentCloud.first, clusterTolerance, minSize, maxSize);
 
     int clusterId = 0;
     std::vector<Color> colors = {Color(1,0,0), Color(1,1,0), Color(0,0,1)};
@@ -379,6 +380,7 @@ void mainSingleShot()
     //cityBlockVer1(viewer);
     cityBlockVer1Solution(viewer);
 
+
     // Run Simulation
     while (!viewer->wasStopped ())
     {
@@ -418,7 +420,8 @@ void mainStream()
         inputCloudI = pointProcessorI->loadPcd((*streamIterator).string());
 
         // Set Environment
-        cityBlockVer2(viewer,pointProcessorI,inputCloudI);
+        //cityBlockVer2(viewer,pointProcessorI,inputCloudI);
+        cityBlockVer3(viewer,pointProcessorI,inputCloudI);
 
         // Update Iterator
         streamIterator++;
@@ -438,7 +441,7 @@ void mainStream()
 
 int main (int argc, char** argv)
 {
-    const int runType = 0;
+    const int runType = 1;
 
     switch(runType)
     {

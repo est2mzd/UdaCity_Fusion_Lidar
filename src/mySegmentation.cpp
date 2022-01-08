@@ -14,7 +14,7 @@
 template<typename PointT>
 std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT>::Ptr> mySegmentPlane(typename pcl::PointCloud<PointT>::Ptr cloud, int maxIterations, float distanceThreshold)
 {
-    std::unordered_set<int> inliers = myRansac3D(cloud, maxIterations, distanceThreshold); // 100, 0.2
+    std::unordered_set<int> inliers = myRansac3D<PointT>(cloud, maxIterations, distanceThreshold); // 100, 0.2
 
     typename pcl::PointCloud<PointT>::Ptr  cloudInliers(new typename pcl::PointCloud<PointT>()); // Plane
     typename pcl::PointCloud<PointT>::Ptr cloudOutliers(new typename pcl::PointCloud<PointT>()); // Obstacles
@@ -22,8 +22,9 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     // Check All points.
     for(int index = 0; index < cloud->points.size(); index++)
     {
-        std::cout << "myRansac3D, index = " << index << std::endl;
-        typename pcl::PointCloud<PointT>::Ptr point = cloud->points[index]; // pick up each point
+        //std::cout << "myRansac3D, index = " << index << std::endl;
+        //typename pcl::PointCloud<PointT>::Ptr point = cloud->points[index]; // pick up each point
+        auto point = cloud->points[index]; // pick up each point
 
         if(inliers.count(index)) // check if this point is in inliers.
             cloudInliers->points.push_back(point);

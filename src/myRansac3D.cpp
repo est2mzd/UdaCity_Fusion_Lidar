@@ -61,7 +61,7 @@ std::unordered_set<int> myRansac3D(typename pcl::PointCloud<PointT>::Ptr cloud, 
                 continue;
             }
 
-            pcl::PointXYZ point = cloud->points[index];
+            auto point = cloud->points[index];
             Q.x() = point.x;
             Q.y() = point.y;
             Q.z() = point.z;
