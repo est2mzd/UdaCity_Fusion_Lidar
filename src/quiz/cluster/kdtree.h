@@ -79,7 +79,6 @@ struct KdTree
     // Lesson : Lidar-3-7 : Searching Points in a KD-Tree
     void searchHelper(std::vector<float> target, Node* node, int depth, float distanceTol, std::vector<int>& ids)
     {
-
         if(node != nullptr)
         {
             // Check if node is in the box of target torelance

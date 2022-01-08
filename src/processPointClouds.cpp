@@ -52,8 +52,8 @@ typename pcl::PointCloud<PointT>::Ptr ProcessPointClouds<PointT>::FilterCloud(ty
     // Step-3 : Set Roof Cloud   
     pcl::CropBox<PointT> cropBoxRoof(true);
     std::vector<int> roofCloud;
-    cropBoxRoof.setMin(Eigen::Vector4f(-1.5, -1.7, -1.0, 1.0));
-    cropBoxRoof.setMax(Eigen::Vector4f( 2.6,  1.7, -0.4, 1.0));
+    cropBoxRoof.setMin(Eigen::Vector4f(-1.5, -1.7, -1.0, 1.0)); // x, y, z, w
+    cropBoxRoof.setMax(Eigen::Vector4f( 2.6,  1.7, -0.4, 1.0)); // x, y, z, w
     cropBoxRoof.setInputCloud(cropedCloud);
     cropBoxRoof.filter(roofCloud);
 

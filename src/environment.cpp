@@ -8,6 +8,8 @@
 // using templates for processPointClouds so also include .cpp to help linker
 #include "processPointClouds.cpp"
 
+//
+#include <unistd.h>
 #include "myUtility.cpp"
 
 std::vector<Car> initHighway(bool renderScene, pcl::visualization::PCLVisualizer::Ptr& viewer)
@@ -94,8 +96,8 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
 
 
 //-----------------------------------------------------------------------------------------
-// Lesson : Lidar-4-2. Load PCD
-void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
+// Lesson : Lidar-4-2. Load PCD && Lidar-4-6, Steps For Obstacle Detection
+void cityBlockVer1(pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
     //-----------------------------------------------------------------------------------------
     // Settings
@@ -170,18 +172,123 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
 
         ++clusterId;
     }
-} 
+}
+
+//-----------------------------------------------------------------------------------------
+// Lesson : Lidar-4-6, Steps For Obstacle Detection
+void cityBlockVer1Solution(pcl::visualization::PCLVisualizer::Ptr& viewer)
+{
+    //-----------------------------------------------------------------------------------------
+    // Step-1 : Load PCD, Open 3D viewer and Display City Block
+    ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
+    pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
+
+    //-----------------------------------------------------------------------------------------
+    // Step-2 : Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
+    ProcessPointClouds<pcl::PointXYZI> pointProcessor;
+    float filterResolution       = 0.3; // mine is 0.1
+    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-10.0, -5.0, -2.0, 1);
+    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f(  30.0, 8.0,  1.0, 1);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor.FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
+
+    //-----------------------------------------------------------------------------------------
+    // Step-3 : Separate PointClouds to Plane and Obstacles
+    int maxIterations       = 25; // mine is 10;
+    float distanceThreshold = 0.3; // mine is 0.15;
+    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessor.SegmentPlane(filteredCloud, maxIterations, distanceThreshold);
+
+    //renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
+    renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0,1,0));
+
+
+    //-----------------------------------------------------------------------------------------
+    // Step-4 : Euclidean Clustering with PCL
+    float clusterTolerance = 0.53; // mine is 1.0;
+    int minSize = 10; // mine is 5;
+    int maxSize = 500; // mine is 1500;
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessor.Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
+
+    int clusterId = 0;
+    std::vector<Color> colors = {Color(1,0,0), Color(1,1,0), Color(0,0,1)};
+    for(pcl::PointCloud<pcl::PointXYZI>::Ptr cluster : cloudClusters)
+    {
+        std::cout << "cluster size ";
+        pointProcessor.numPoints(cluster);
+        renderPointCloud(viewer, cluster, "obstCloud" + std::to_string(clusterId), colors[clusterId % colors.size()]);
+
+        //-----------------------------------------------------------------------------------------
+        // Lesson : Lidar-3-9. Bounding Boxes
+            Box box = pointProcessor.BoundingBox(cluster);
+            renderBox(viewer, box, clusterId);
+        //-----------------------------------------------------------------------------------------
+
+        ++clusterId;
+    }
+}
+
+//-----------------------------------------------------------------------------------------
+// Lesson : Lidar-4-7
+void cityBlockVer2(pcl::visualization::PCLVisualizer::Ptr& viewer,
+                   ProcessPointClouds<pcl::PointXYZI>* pointProcessorI,
+                   const pcl::PointCloud<pcl::PointXYZI>::Ptr& inputCloud)
+{
+    //-----------------------------------------------------------------------------------------
+    // Step-1 : Load PCD, Open 3D viewer and Display City Block
+    //ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
+    //pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
+
+    //-----------------------------------------------------------------------------------------
+    // Step-2 : Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
+    //ProcessPointClouds<pcl::PointXYZI> pointProcessorI;
+    float filterResolution       = 0.3; // mine is 0.1
+    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-10.0, -5.0, -2.0, 1);
+    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f(  30.0, 8.0,  1.0, 1);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessorI->FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
+
+    //-----------------------------------------------------------------------------------------
+    // Step-3 : Separate PointClouds to Plane and Obstacles
+    int maxIterations       = 25; // mine is 10;
+    float distanceThreshold = 0.3; // mine is 0.15;
+    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(filteredCloud, maxIterations, distanceThreshold);
+
+    //renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
+    renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0,1,0));
+
+    //-----------------------------------------------------------------------------------------
+    // Step-4 : Euclidean Clustering with PCL
+    float clusterTolerance = 0.53; // mine is 1.0;
+    int minSize = 10; // mine is 5;
+    int maxSize = 500; // mine is 1500;
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
+
+    int clusterId = 0;
+    std::vector<Color> colors = {Color(1,0,0), Color(1,1,0), Color(0,0,1)};
+    for(pcl::PointCloud<pcl::PointXYZI>::Ptr cluster : cloudClusters)
+    {
+        //std::cout << "cluster size ";
+        //pointProcessorI->numPoints(cluster);
+        renderPointCloud(viewer, cluster, "obstCloud" + std::to_string(clusterId), colors[clusterId % colors.size()]);
+
+        //-----------------------------------------------------------------------------------------
+        // Lesson : Lidar-3-9. Bounding Boxes
+        Box box = pointProcessorI->BoundingBox(cluster);
+        renderBox(viewer, box, clusterId);
+        //-----------------------------------------------------------------------------------------
+
+        ++clusterId;
+    }
+}
 
 
 //setAngle: SWITCH CAMERA ANGLE {XY, TopDown, Side, FPS}
-void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& viewer)
+void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& viewer, const int distance=16)
 {
     viewer->setBackgroundColor (0, 0, 0);
     
     // set camera position and angle
     viewer->initCameraParameters();
     // distance away in meters
-    int distance = 16;
+    //int distance = 16;
     
     switch(setAngle)
     {
@@ -195,39 +302,95 @@ void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& vi
         viewer->addCoordinateSystem (1.0);
 }
 
-
-
-int main (int argc, char** argv)
+//-------------------------------------------------------------------------//
+void mainSingleShot()
 {
-    std::cout << "starting enviroment" << std::endl;
+    std::cout << "starting environment : mainSingleShot()" << std::endl;
 
+    // Create viewer
     pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
+
+    // Set Camera
     CameraAngle setAngle = TopDown; // XY, TopDown, Side, FPS
-    initCamera(setAngle, viewer);
+    const int cameraDistance = 30;
+    initCamera(setAngle, viewer, cameraDistance);
+
+    // Set Environment
     //simpleHighway(viewer);
-    
-    //-----------------------------------------------------------------------------------------
-    // Lesson : Lidar-4-2. Load PCD
-    cityBlock(viewer);
+    //cityBlockVer1(viewer);
+    cityBlockVer1Solution(viewer);
 
-    std::string folderPath  = "/home/workspace/Udacity_Fusion_Lidar";
-    std::string fileNamePng = folderPath + "/png/L4_6_" + getCurrentTime("") + ".png";
-    std:cout << fileNamePng << std::endl;
-    //pcl::visualization::PCLVisualizer pngObj("PNG OBJ");
-    
-
-    /*
+    // Run Simulation
     while (!viewer->wasStopped ())
     {
         viewer->spinOnce ();
     }
-    */ 
+}
 
-    viewer->saveScreenshot(fileNamePng);
-    for(int i=0; i<1000; i++)
+//-------------------------------------------------------------------------//
+void mainStream()
+{
+    std::cout << "starting environment : mainStream()" << std::endl;
+
+    // Create viewer
+    pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
+
+    // Set Camera
+    CameraAngle setAngle = TopDown; // XY, TopDown, Side, FPS
+    const int cameraDistance = 30;
+    initCamera(setAngle, viewer, cameraDistance);
+
+    // Create instances
+    ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
+    pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloudI;
+
+    // Create Stream Instance
+    std::vector<boost::filesystem::path> stream = pointProcessorI->streamPcd("../src/sensors/data/pcd/data_1");
+    auto streamIterator = stream.begin();
+
+    // Run Simulation
+    while (!viewer->wasStopped ())
     {
+        // Clear viewer
+        viewer->removeAllPointClouds();
+        viewer->removeAllShapes();
+
+        // Load pcd and run obstacle detection process
+        inputCloudI = pointProcessorI->loadPcd((*streamIterator).string());
+
+        // Set Environment
+        cityBlockVer2(viewer,pointProcessorI,inputCloudI);
+
+        // Update Iterator
+        streamIterator++;
+        if(streamIterator == stream.end())
+        {
+            streamIterator = stream.begin();
+            usleep(1000.0*1000); // micro seconds
+        }
+
+        // Run
         viewer->spinOnce ();
-    } 
-    //viewer->saveScreenshot(fileNamePng);
-    pcl::io::save(fileNamePng, viewer);
+        usleep(100.0*1000); // micro seconds
+        //viewer->saveScreenshot("/home/takuya/HDD1/UdaCity/Fusion/SFND_Lidar_Obstacle_Detection/png/test2.png");
+        //break;
+    }
+}
+
+int main (int argc, char** argv)
+{
+    const int runType = 1;
+
+    switch(runType)
+    {
+        case 0:
+            mainSingleShot();
+            break;
+        case 1:
+            mainStream();
+            break;
+        default:
+            std::cout << "runType is wrong!" << std::endl;
+            break;
+    }
 }
