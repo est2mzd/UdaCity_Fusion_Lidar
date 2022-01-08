@@ -36,7 +36,12 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr CreateData(std::vector<std::vector<float>> p
   		pcl::PointXYZ point;
   		point.x = points[i][0];
   		point.y = points[i][1];
-  		point.z = 0;
+
+        if(points[i].size() < 3){
+            point.z = 0;
+        }else{
+            point.z = points[i][2];
+        }
 
   		cloud->points.push_back(point);
 
@@ -74,10 +79,7 @@ void render2DTree(Node* node, pcl::visualization::PCLVisualizer::Ptr& viewer, Bo
 
 		render2DTree(node->left,viewer, lowerWindow, iteration, depth+1);
 		render2DTree(node->right,viewer, upperWindow, iteration, depth+1);
-
-
 	}
-
 }
 
 void clusterHelper(int id, const std::vector<std::vector<float>> points, std::vector<int>& clusters, std::vector<bool>& processed, KdTree* tree, float distanceTol)
@@ -141,7 +143,8 @@ int main ()
 	pcl::visualization::PCLVisualizer::Ptr viewer = initScene(window, 25);
 
 	// Create data
-	std::vector<std::vector<float>> points = { {-6.2,7}, {-6.3,8.4}, {-5.2,7.1}, {-5.7,6.3}, {7.2,6.1}, {8.0,5.3}, {7.2,7.1}, {0.2,-7.1}, {1.7,-6.9}, {-1.2,-7.2}, {2.2,-8.9} };
+	//std::vector<std::vector<float>> points = { {-6.2,7}, {-6.3,8.4}, {-5.2,7.1}, {-5.7,6.3}, {7.2,6.1}, {8.0,5.3}, {7.2,7.1}, {0.2,-7.1}, {1.7,-6.9}, {-1.2,-7.2}, {2.2,-8.9} };
+    std::vector<std::vector<float>> points = { {-6.2,7,1}, {-6.3,8.4,1}, {-5.2,7.1,1}, {-5.7,6.3,1}, {7.2,6.1,1}, {8.0,5.3,1}, {7.2,7.1,1}, {0.2,-7.1,1}, {1.7,-6.9,1}, {-1.2,-7.2,1}, {2.2,-8.9,1} };
 	//std::vector<std::vector<float>> points = { {-6.2,7}, {-6.3,8.4}, {-5.2,7.1}, {-5.7,6.3} };
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData(points);
 

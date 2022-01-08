@@ -117,6 +117,70 @@ struct KdTree
     }
 
 
+
+    //--------------------------------------------------------------------------------------//
+    // Project : For 3D
+    void searchHelperVer2(std::vector<float> target, Node* node, int depth, float distanceTol, std::vector<int>& ids)
+    {
+        if(node != nullptr)
+        {
+            // Check if node is in the box of target torelance
+            const int nodeSize   = node->point.size();
+            const int targetSize = target.size();
+            int coordSize;
+
+            if(targetSize > nodeSize){
+                coordSize = nodeSize;
+            }else{
+                coordSize = targetSize;
+            }
+
+            //std::cout << "coordSize = " << coordSize << std::endl;
+            bool targetIsInArea = true;
+            for(int i=0; i < coordSize; i++)
+            {
+                targetIsInArea *= (node->point[i] >= (target[i]-distanceTol));
+                targetIsInArea *= (node->point[i] <= (target[i]+distanceTol));
+            }
+
+            //
+            if(targetIsInArea)
+            {
+                float distance = 0;
+
+                for(int i=0; i < coordSize; i++)
+                {
+                    float tmpDistance = (node->point[i] - target[i]);
+                    distance += tmpDistance * tmpDistance;
+                }
+
+                distance = sqrt(distance);
+
+                if(distance <= distanceTol)
+                {
+                    ids.push_back(node->id);
+                    //std::cout << "id = " << node->id << " / distance = " << distance << std::endl;
+                }
+            }
+
+            // recursively do searchHelper
+            // Check : we must search in which area
+            int XorYorZ = depth % coordSize;
+            bool selectLowerArea  = (target[XorYorZ] - distanceTol) < node->point[XorYorZ];
+            bool selectHigherArea = (target[XorYorZ] + distanceTol) > node->point[XorYorZ];
+
+            if( selectLowerArea )
+            {
+                searchHelperVer2(target, node->left, depth+1, distanceTol, ids);
+            }
+
+            if( selectHigherArea )
+            {
+                searchHelperVer2(target, node->right, depth+1, distanceTol, ids);
+            }
+        }
+    }
+
     //--------------------------------------------------------------------------------------//
     // Lesson : Lidar-3-7 : Searching Points in a KD-Tree
 	// return a list of point ids in the tree that are within distance of target
@@ -124,10 +188,15 @@ struct KdTree
 	{
 		std::vector<int> ids;
         // Helper function
-        searchHelper(target, root, 0, distanceTol, ids);
+        //searchHelper(target, root, 0, distanceTol, ids);
+        searchHelperVer2(target, root, 0, distanceTol, ids);
 		return ids;
 	}
-	
+
+
+
+
+
 
 };
 

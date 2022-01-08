@@ -233,13 +233,16 @@ int main ()
 	//std::unordered_set<int> inliers = Ransac2D(cloud, 10, 1.0);
     std::unordered_set<int> inliers = Ransac3D(cloud, 100, 0.2);
 
-	pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
+	pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>()); // Plane
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>()); // Obstacles
 
+    // Check All points.
 	for(int index = 0; index < cloud->points.size(); index++)
 	{
-		pcl::PointXYZ point = cloud->points[index];
-		if(inliers.count(index))
+        std::cout << "Ransac3D, index = " << index << std::endl;
+		pcl::PointXYZ point = cloud->points[index]; // pick up each point
+
+		if(inliers.count(index)) // check if this point is in inliers.
 			cloudInliers->points.push_back(point);
 		else
 			cloudOutliers->points.push_back(point);
