@@ -2,6 +2,8 @@
 #include <time.h>
 #include <iostream>
 
+
+
 //--------------------------------------------------------------//
 std::string replaceStringSingle(std::string& strToReplace, std::string strBefore, std::string strAfter )
 {
@@ -72,3 +74,5 @@ const std::string getCurrentTime(const std::string nameHeader)
 
     return output;
 }
+
+//viewer->saveScreenshot("/home/takuya/HDD1/UdaCity/Fusion/SFND_Lidar_Obstacle_Detection/png/test2.png");

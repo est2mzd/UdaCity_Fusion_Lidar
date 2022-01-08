@@ -11,6 +11,8 @@
 //
 #include <unistd.h>
 #include "myUtility.cpp"
+#include "mySegmentation.cpp"
+#include "myCluster.cpp"
 
 std::vector<Car> initHighway(bool renderScene, pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
@@ -38,6 +40,27 @@ std::vector<Car> initHighway(bool renderScene, pcl::visualization::PCLVisualizer
     return cars;
 }
 
+//setAngle: SWITCH CAMERA ANGLE {XY, TopDown, Side, FPS}
+void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& viewer, const int distance=16)
+{
+    viewer->setBackgroundColor (0, 0, 0);
+
+    // set camera position and angle
+    viewer->initCameraParameters();
+    // distance away in meters
+    //int distance = 16;
+
+    switch(setAngle)
+    {
+        case XY : viewer->setCameraPosition(-distance, -distance, distance, 1, 1, 0); break;
+        case TopDown : viewer->setCameraPosition(0, 0, distance, 1, 0, 1); break;
+        case Side : viewer->setCameraPosition(0, -distance, 0, 0, 0, 1); break;
+        case FPS : viewer->setCameraPosition(-10, 0, 0, 0, 0, 1);
+    }
+
+    if(setAngle!=FPS)
+        viewer->addCoordinateSystem (1.0);
+}
 
 void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
@@ -89,7 +112,6 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
         Box box = pointProcessor.BoundingBox(cluster);
         renderBox(viewer, box, clusterId);
         //-----------------------------------------------------------------------------------------
-
         ++clusterId;
     }
 }
@@ -280,27 +302,64 @@ void cityBlockVer2(pcl::visualization::PCLVisualizer::Ptr& viewer,
 }
 
 
-//setAngle: SWITCH CAMERA ANGLE {XY, TopDown, Side, FPS}
-void initCamera(CameraAngle setAngle, pcl::visualization::PCLVisualizer::Ptr& viewer, const int distance=16)
+//-----------------------------------------------------------------------------------------
+// for Project
+void cityBlockVer3(pcl::visualization::PCLVisualizer::Ptr& viewer,
+                   ProcessPointClouds<pcl::PointXYZI>* pointProcessorI,
+                   const pcl::PointCloud<pcl::PointXYZI>::Ptr& inputCloud)
 {
-    viewer->setBackgroundColor (0, 0, 0);
-    
-    // set camera position and angle
-    viewer->initCameraParameters();
-    // distance away in meters
-    //int distance = 16;
-    
-    switch(setAngle)
-    {
-        case XY : viewer->setCameraPosition(-distance, -distance, distance, 1, 1, 0); break;
-        case TopDown : viewer->setCameraPosition(0, 0, distance, 1, 0, 1); break;
-        case Side : viewer->setCameraPosition(0, -distance, 0, 0, 0, 1); break;
-        case FPS : viewer->setCameraPosition(-10, 0, 0, 0, 0, 1);
-    }
+    //-----------------------------------------------------------------------------------------
+    // Step-1 : Load PCD, Open 3D viewer and Display City Block
+    //ProcessPointClouds<pcl::PointXYZI>* pointProcessorI = new ProcessPointClouds<pcl::PointXYZI>();
+    //pcl::PointCloud<pcl::PointXYZI>::Ptr inputCloud = pointProcessorI->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
 
-    if(setAngle!=FPS)
-        viewer->addCoordinateSystem (1.0);
+    //-----------------------------------------------------------------------------------------
+    // Step-2 : Apply filter : Voxel Grid , Region of Interest , Remove roof poitns
+    //ProcessPointClouds<pcl::PointXYZI> pointProcessorI;
+    float filterResolution       = 0.3; // mine is 0.1
+    Eigen::Vector4f boxMinPoint  = Eigen::Vector4f(-10.0, -5.0, -2.0, 1);
+    Eigen::Vector4f boxMaxPoint  = Eigen::Vector4f(  30.0, 8.0,  1.0, 1);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessorI->FilterCloud(inputCloud, filterResolution, boxMinPoint, boxMaxPoint);
+
+    //-----------------------------------------------------------------------------------------
+    // Step-3 : Separate PointClouds to Plane and Obstacles
+    int maxIterations       = 25; // mine is 10;
+    float distanceThreshold = 0.3; // mine is 0.15;
+    //std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = pointProcessorI->SegmentPlane(filteredCloud, maxIterations, distanceThreshold);
+    std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud = mySegmentPlane(filteredCloud, maxIterations, distanceThreshold);
+
+    //renderPointCloud(viewer, segmentCloud.first, "obstCloud", Color(1,0,0));
+    renderPointCloud(viewer, segmentCloud.second, "planeCloud", Color(0,1,0));
+
+    //-----------------------------------------------------------------------------------------
+    // Step-4 : Euclidean Clustering with PCL
+    float clusterTolerance = 0.53; // mine is 1.0;
+    int minSize = 10; // mine is 5;
+    int maxSize = 500; // mine is 1500;
+    //std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = pointProcessorI->Clustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
+    std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> cloudClusters = myClustering(segmentCloud.first, clusterTolerance, minSize, maxSize);
+
+    int clusterId = 0;
+    std::vector<Color> colors = {Color(1,0,0), Color(1,1,0), Color(0,0,1)};
+    for(pcl::PointCloud<pcl::PointXYZI>::Ptr cluster : cloudClusters)
+    {
+        //std::cout << "cluster size ";
+        //pointProcessorI->numPoints(cluster);
+        renderPointCloud(viewer, cluster, "obstCloud" + std::to_string(clusterId), colors[clusterId % colors.size()]);
+
+        //-----------------------------------------------------------------------------------------
+        // Lesson : Lidar-3-9. Bounding Boxes
+        Box box = pointProcessorI->BoundingBox(cluster);
+        renderBox(viewer, box, clusterId);
+        //-----------------------------------------------------------------------------------------
+
+        ++clusterId;
+    }
 }
+
+
+
+
 
 //-------------------------------------------------------------------------//
 void mainSingleShot()
@@ -379,7 +438,7 @@ void mainStream()
 
 int main (int argc, char** argv)
 {
-    const int runType = 1;
+    const int runType = 0;
 
     switch(runType)
     {
