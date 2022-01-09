@@ -54,7 +54,7 @@ struct KdTree
         else
         {
             // Calculate current dim
-            uint current_dim = depth % 2; // 0 or 1
+            uint current_dim = depth % points.size(); // 0 or 1
             
             // if depth is even(0) -> compare X value
             // if depth is odd(1)  -> compare Y value
