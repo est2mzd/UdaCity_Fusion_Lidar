@@ -45,8 +45,8 @@ struct KdTree
 
     //--------------------------------------------------------------------------------------//
     // Lesson : Lidar-3-6 : Insert Points
-    // inputs from parent is point and id 
-    void insertHelper(Node** node, uint depth, std::vector<float> point, int id)
+    // inputs from parent is point and id_in_point_cloud
+    void insertHelper(Node** node, uint depth, std::vector<float> point, int id_in_point_cloud)
     {
         // If tree is empty.
         if(*node == nullptr)
@@ -56,7 +56,7 @@ struct KdTree
 
             // *node is Address of the Real Object
             // * is de-reference
-            *node = new Node(point, id);
+            *node = new Node(point, id_in_point_cloud);
         }
         else
         {
@@ -65,23 +65,23 @@ struct KdTree
             
             if(point[current_dim] < ((*node)->point[current_dim])  )
             {
-                insertHelper(&((*node)->left), depth+1, point, id);
+                insertHelper(&((*node)->left), depth+1, point, id_in_point_cloud);
             }
             else
             {
-                insertHelper(&((*node)->right), depth+1, point, id);
+                insertHelper(&((*node)->right), depth+1, point, id_in_point_cloud);
             }
         }
-        //std::cout << "id = " << id << std::endl;
+        //std::cout << "id_in_point_cloud = " << id_in_point_cloud << std::endl;
     }
 
     //--------------------------------------------------------------------------------------//
     // Lesson : Lidar-3-6 : Insert Points
-	void insert(std::vector<float> point, int id)
+	void insert(std::vector<float> point, int id_in_point_cloud)
 	{
 		// TODO: Fill in this function to insert a new point into the tree
 		// the function should create a new node and place correctly with in the root
-        insertHelper(&root, 0, point, id);
+        insertHelper(&root, 0, point, id_in_point_cloud);
 	}
 
     //--------------------------------------------------------------------------------------//
