@@ -83,16 +83,16 @@ std::vector<typename pcl::PointCloud<PointT>::Ptr> myClustering(typename pcl::Po
     }
 
     // Euclidean Clustering
-    std::vector<std::vector<int>> clusterIndices = myEuclideanCluster<PointT>(cloud, tree, clusterTolerance);
+    std::vector<std::vector<int>> multiClusterIds = myEuclideanCluster<PointT>(cloud, tree, clusterTolerance);
 
-    for(std::vector<int> getIndices : clusterIndices)
+    for(std::vector<int> singleClusterIds : multiClusterIds)
     {
-        if((getIndices.size() < minSize) || (getIndices.size() > maxSize)){
+        if((singleClusterIds.size() < minSize) || (singleClusterIds.size() > maxSize)){
             continue;
         }
 
         typename pcl::PointCloud<PointT>::Ptr cloudCluster(new pcl::PointCloud<PointT>);
-        for(int index: getIndices){
+        for(int index: singleClusterIds){
             cloudCluster->points.push_back(cloud->points[index]);
         }
         clusters.push_back(cloudCluster);

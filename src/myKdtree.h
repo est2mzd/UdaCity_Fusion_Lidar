@@ -125,6 +125,9 @@ struct KdTree
             bool selectLowerArea  = (target_point[XorYorZ] - distanceTol) < node->point[XorYorZ];
             bool selectHigherArea = (target_point[XorYorZ] + distanceTol) > node->point[XorYorZ];
 
+            //bool selectLowerArea  = (target_point[XorYorZ] <  node->point[XorYorZ] );
+            //bool selectHigherArea = (target_point[XorYorZ] >= node->point[XorYorZ] );
+
             if( selectLowerArea )
             {
                 searchHelper(target_point, node->left, depth + 1, distanceTol, nearest_point_ids);
@@ -134,6 +137,7 @@ struct KdTree
             {
                 searchHelper(target_point, node->right, depth + 1, distanceTol, nearest_point_ids);
             }
+
         }
     }
 
