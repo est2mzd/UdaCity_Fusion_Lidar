@@ -142,3 +142,21 @@ The workspace provided in the SFND classroom comes preinstallated with everythin
 [PCL Source Github](https://github.com/PointCloudLibrary/pcl)
 
 [PCL Mac Compilation Docs](https://pcl.readthedocs.io/projects/tutorials/en/latest/compiling_pcl_macosx.html#compiling-pcl-macosx)
+
+
+### My Programs Guid for Lidar Project
+
+- Main Program : environment.cpp
+  <img src="media/Program_Guide_Lidar/environment.cpp.png">
+- Lidar main process
+  <img src="media/Program_Guide_Lidar/LidarMainProcess.png">
+- myRansac3D()
+  <img src="media/Program_Guide_Lidar/myRansac3D().png">
+- myClustering()
+  <img src="media/Program_Guide_Lidar/myClustering().png">
+- myEuclideanCluster()
+  <img src="media/Program_Guide_Lidar/myEuclideanCluster().png">
+- myKdTree::insert().png
+  <img src="media/Program_Guide_Lidar/myKdTree__insert().png">
+- myKdTree::search().png
+  <img src="media/Program_Guide_Lidar/myKdTree__search().png">
