@@ -18,12 +18,12 @@ void clusterHelper(int id, typename pcl::PointCloud<PointT>::Ptr cloud, std::vec
     processed[id] = true;
     cluster.push_back(id);
 
-    // Find the nearest point list of points[id] --> nearest
+    // Find the nearest_point_ids point list of points[id] --> nearest_point_ids
     std::vector<float> point = {cloud->points[id].x, cloud->points[id].y, cloud->points[id].z};
-    std::vector<int> nearest = tree->search(point, distanceTol);
+    std::vector<int> nearest_point_ids = tree->search(point, distanceTol);
 
-    // process the points in "ids of nearest"
-    for(int i : nearest)
+    // process the points in "ids of nearest_point_ids"
+    for(int i : nearest_point_ids)
     {
         if(!processed[i])
         {

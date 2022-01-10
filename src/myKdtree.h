@@ -10,10 +10,13 @@
 //-----------------------------------------------------------------------------------//
 struct Node
 {
-	std::vector<float> point;
-	int id;
-	Node* left;
-	Node* right;
+    // self data
+	std::vector<float> point; // point of self
+	int id;      // id of point of self in cloud array
+
+    // child data
+	Node* left;  // left child node
+	Node* right; // right child node
 
 	Node(std::vector<float> arr, int setId)
 	:	point(arr), id(setId), left(NULL), right(NULL)
@@ -42,29 +45,31 @@ struct KdTree
 
     //--------------------------------------------------------------------------------------//
     // Lesson : Lidar-3-6 : Insert Points
-    void insertHelper(Node** node, uint depth, std::vector<float> points, int id)
+    // inputs from parent is point and id 
+    void insertHelper(Node** node, uint depth, std::vector<float> point, int id)
     {
         // If tree is empty.
         if(*node == nullptr)
         {
+            // if left or right child node is not created or root is not created ,
+            // create new node, and stop this function
+
             // *node is Address of the Real Object
             // * is de-reference
-            *node = new Node(points, id);
+            *node = new Node(point, id);
         }
         else
         {
             // Calculate current dim
-            uint current_dim = depth % points.size(); // 0 or 1
+            uint current_dim = depth % point.size(); // 0 or 1 or 2
             
-            // if depth is even(0) -> compare X value
-            // if depth is odd(1)  -> compare Y value
-            if( points[current_dim] < ((*node)->point[current_dim])  )
+            if(point[current_dim] < ((*node)->point[current_dim])  )
             {
-                insertHelper(&((*node)->left), depth+1, points, id);
+                insertHelper(&((*node)->left), depth+1, point, id);
             }
             else
             {
-                insertHelper(&((*node)->right), depth+1, points, id);
+                insertHelper(&((*node)->right), depth+1, point, id);
             }
         }
         //std::cout << "id = " << id << std::endl;
@@ -72,36 +77,27 @@ struct KdTree
 
     //--------------------------------------------------------------------------------------//
     // Lesson : Lidar-3-6 : Insert Points
-	void insert(std::vector<float> points, int id)
+	void insert(std::vector<float> point, int id)
 	{
 		// TODO: Fill in this function to insert a new point into the tree
 		// the function should create a new node and place correctly with in the root
-        insertHelper(&root, 0, points, id);
+        insertHelper(&root, 0, point, id);
 	}
 
     //--------------------------------------------------------------------------------------//
     // Project : For 3D
-    void searchHelper(std::vector<float> target, Node* node, int depth, float distanceTol, std::vector<int>& ids)
+    void searchHelper(std::vector<float> target_point, Node* node, int depth, float distanceTol, std::vector<int>& nearest_point_ids)
     {
         if(node != nullptr)
         {
-            // Check if node is in the box of target torelance
-            const int nodeSize   = node->point.size();
-            const int targetSize = target.size();
-            int coordSize;
+            // Check if node is in the box of target_point torelance
+            const int coordSize = target_point.size();
 
-            if(targetSize > nodeSize){
-                coordSize = nodeSize;
-            }else{
-                coordSize = targetSize;
-            }
-
-            //std::cout << "coordSize = " << coordSize << std::endl;
             bool targetIsInArea = true;
             for(int i=0; i < coordSize; i++)
             {
-                targetIsInArea *= (node->point[i] >= (target[i]-distanceTol));
-                targetIsInArea *= (node->point[i] <= (target[i]+distanceTol));
+                targetIsInArea *= (node->point[i] >= (target_point[i] - distanceTol));
+                targetIsInArea *= (node->point[i] <= (target_point[i] + distanceTol));
             }
 
             //
@@ -111,7 +107,7 @@ struct KdTree
 
                 for(int i=0; i < coordSize; i++)
                 {
-                    float tmpDistance = (node->point[i] - target[i]);
+                    float tmpDistance = (node->point[i] - target_point[i]);
                     distance += tmpDistance * tmpDistance;
                 }
 
@@ -119,38 +115,37 @@ struct KdTree
 
                 if(distance <= distanceTol)
                 {
-                    ids.push_back(node->id);
-                    //std::cout << "id = " << node->id << " / distance = " << distance << std::endl;
+                    nearest_point_ids.push_back(node->id);
                 }
             }
 
             // recursively do searchHelper
             // Check : we must search in which area
             int XorYorZ = depth % coordSize;
-            bool selectLowerArea  = (target[XorYorZ] - distanceTol) < node->point[XorYorZ];
-            bool selectHigherArea = (target[XorYorZ] + distanceTol) > node->point[XorYorZ];
+            bool selectLowerArea  = (target_point[XorYorZ] - distanceTol) < node->point[XorYorZ];
+            bool selectHigherArea = (target_point[XorYorZ] + distanceTol) > node->point[XorYorZ];
 
             if( selectLowerArea )
             {
-                searchHelper(target, node->left, depth+1, distanceTol, ids);
+                searchHelper(target_point, node->left, depth + 1, distanceTol, nearest_point_ids);
             }
 
             if( selectHigherArea )
             {
-                searchHelper(target, node->right, depth+1, distanceTol, ids);
+                searchHelper(target_point, node->right, depth + 1, distanceTol, nearest_point_ids);
             }
         }
     }
 
     //--------------------------------------------------------------------------------------//
     // Lesson : Lidar-3-7 : Searching Points in a KD-Tree
-	// return a list of point ids in the tree that are within distance of target
-	std::vector<int> search(std::vector<float> target, float distanceTol)
+	// return a list of point ids in the tree that are within distance of target_point
+	std::vector<int> search(std::vector<float> target_point, float distanceTol)
 	{
-		std::vector<int> ids;
+		std::vector<int> nearest_point_ids;
         // Helper function
-        searchHelper(target, root, 0, distanceTol, ids);
-		return ids;
+        searchHelper(target_point, root, 0, distanceTol, nearest_point_ids);
+		return nearest_point_ids;
 	}
 }; // end of struct KdTree
 
